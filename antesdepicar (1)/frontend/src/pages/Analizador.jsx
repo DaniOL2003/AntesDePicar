@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { LuSparkles, LuLock, LuLandmark, LuTruck, LuBriefcase, LuArrowRight } from 'react-icons/lu';
 import AnalysisResult from '../components/AnalysisResult.jsx';
 import { analizarMensaje, ErrorConexion } from '../services/api.js';
-import { agregarAlHistorial } from '../services/historial.js';
+import { agregarAlHistorialInvitado } from '../services/historial.js';
 import { EJEMPLOS, resultadoDeMuestra } from '../data/ejemplos.js';
 import './Analizador.css';
 
@@ -26,7 +26,7 @@ const ESTAFAS_COMUNES = [
     texto: 'Trabajos “desde casa” con pagos altos por dar likes o calificar productos, que terminan pidiendo depósitos.' },
 ];
 
-export default function Analizador({ irA }) {
+export default function Analizador({ irA, sesion }) {
   const [mensaje, setMensaje] = useState('');
   const [canal, setCanal] = useState('sms');
   const [cargando, setCargando] = useState(false);
@@ -50,7 +50,7 @@ export default function Analizador({ irA }) {
     setResultado(null);
     try {
       const datos = await analizarMensaje(mensaje.trim(), canal);
-      agregarAlHistorial(datos, canal);
+      if (sesion.invitado) agregarAlHistorialInvitado(datos, canal);
       mostrar(datos);
     } catch (err) {
       setError({ texto: err.message, sinConexion: err instanceof ErrorConexion });
@@ -103,7 +103,9 @@ export default function Analizador({ irA }) {
 
           <div className="analizador-pie">
             <span className="muted pequeno">
-              <LuLock /> Tus datos se analizan en nuestro servidor y nunca se almacenan.
+              <LuLock /> {sesion.invitado
+                ? 'Como invitado, tu análisis no se guarda en nuestra base de datos.'
+                : 'Tu análisis se guarda en tu historial privado; puedes borrarlo cuando quieras.'}
               <span className={largo > 0 && !valido ? 'contador-error' : ''}> · {largo}/{MAX}</span>
             </span>
             <button type="submit" className="btn btn-lime" disabled={!valido || cargando}>
@@ -138,7 +140,12 @@ export default function Analizador({ irA }) {
         )}
       </section>
 
-      <div ref={refResultado} className="ancla">{resultado && <AnalysisResult resultado={resultado} onNuevo={nuevo} />}</div>
+      <div ref={refResultado} className="ancla">
+        {resultado && !sesion.invitado && !resultado.demo && !resultado.guardado && (
+          <p className="aviso-demo">Este análisis no se pudo guardar en tu historial. Si tu sesión expiró, vuelve a iniciarla.</p>
+        )}
+        {resultado && <AnalysisResult resultado={resultado} onNuevo={nuevo} />}
+      </div>
 
       <section className="seccion">
         <div className="seccion-encabezado">

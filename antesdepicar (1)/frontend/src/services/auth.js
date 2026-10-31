@@ -1,63 +1,55 @@
-// Sesión del usuario (versión solo frontend).
-// Por ahora todo se guarda en el navegador (localStorage).
-// Cuando el backend esté listo, estas funciones llamarán a /api/login y /api/registro.
+// Sesión del usuario. Las cuentas viven en PostgreSQL y la sesión en una cookie HttpOnly del backend.
+// El invitado no tiene cuenta: su modo dura solo mientras la pestaña esté abierta.
+import { solicitud } from './api.js';
+import { borrarHistorialInvitado } from './historial.js';
 
-const CLAVE_SESION = 'adp_sesion';
-const CLAVE_USUARIOS = 'adp_usuarios';
+const CLAVE_INVITADO = 'adp_invitado';
+const INVITADO = { nombre: 'Invitado', correo: null, invitado: true };
 
-function leer(clave, porDefecto) {
+function hayInvitado() {
   try {
-    return JSON.parse(localStorage.getItem(clave)) ?? porDefecto;
+    return sessionStorage.getItem(CLAVE_INVITADO) === '1';
   } catch {
-    return porDefecto;
+    return false;
   }
 }
 
-function guardar(clave, valor) {
+function salirDeInvitado() {
   try {
-    localStorage.setItem(clave, JSON.stringify(valor));
-  } catch {
-    // navegador sin almacenamiento: la sesión dura mientras la pestaña esté abierta
-  }
-}
-
-export function obtenerSesion() {
-  return leer(CLAVE_SESION, null);
-}
-
-export function registrar({ nombre, correo, contrasena }) {
-  const usuarios = leer(CLAVE_USUARIOS, {});
-  const clave = correo.trim().toLowerCase();
-  if (usuarios[clave]) throw new Error('Ya existe una cuenta con ese correo.');
-  // Demo: en producción la contraseña NUNCA se guarda en el navegador; la valida el backend.
-  usuarios[clave] = { nombre: nombre.trim(), correo: clave, contrasena };
-  guardar(CLAVE_USUARIOS, usuarios);
-  const sesion = { nombre: nombre.trim(), correo: clave };
-  guardar(CLAVE_SESION, sesion);
-  return sesion;
-}
-
-export function iniciarSesion({ correo, contrasena }) {
-  const usuarios = leer(CLAVE_USUARIOS, {});
-  const usuario = usuarios[correo.trim().toLowerCase()];
-  if (!usuario || usuario.contrasena !== contrasena) {
-    throw new Error('Correo o contraseña incorrectos.');
-  }
-  const sesion = { nombre: usuario.nombre, correo: usuario.correo };
-  guardar(CLAVE_SESION, sesion);
-  return sesion;
-}
-
-export function entrarComoInvitado() {
-  const sesion = { nombre: 'Invitado', correo: null, invitado: true };
-  guardar(CLAVE_SESION, sesion);
-  return sesion;
-}
-
-export function cerrarSesion() {
-  try {
-    localStorage.removeItem(CLAVE_SESION);
+    sessionStorage.removeItem(CLAVE_INVITADO);
   } catch {
     // sin almacenamiento
   }
+  borrarHistorialInvitado();
+}
+
+export async function obtenerSesion() {
+  if (hayInvitado()) return INVITADO;
+  try {
+    return await solicitud('/api/auth/sesion');
+  } catch {
+    return null;
+  }
+}
+
+export function registrar({ nombre, correo, contrasena, recordar }) {
+  return solicitud('/api/auth/registro', { metodo: 'POST', cuerpo: { nombre, correo, contrasena, recordar } });
+}
+
+export function iniciarSesion({ correo, contrasena, recordar }) {
+  return solicitud('/api/auth/login', { metodo: 'POST', cuerpo: { correo, contrasena, recordar } });
+}
+
+export function entrarComoInvitado() {
+  try {
+    sessionStorage.setItem(CLAVE_INVITADO, '1');
+  } catch {
+    // navegador sin almacenamiento: el modo invitado dura hasta recargar la página
+  }
+  return INVITADO;
+}
+
+export async function cerrarSesion(sesion) {
+  if (sesion?.invitado) salirDeInvitado();
+  else await solicitud('/api/auth/logout', { metodo: 'POST' });
 }

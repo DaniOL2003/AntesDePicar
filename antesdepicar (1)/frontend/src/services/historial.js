@@ -1,45 +1,36 @@
-// Historial de análisis guardado SOLO en este navegador (localStorage).
-const CLAVE = 'adp_historial';
+// Historial de análisis.
+// Con cuenta: vive en PostgreSQL y cada usuario solo ve el suyo.
+// Invitado: solo en esta pestaña (sessionStorage) y se borra al salir.
+import { solicitud } from './api.js';
 
-const EJEMPLOS_INICIALES = [
-  {
-    id: 'ej1', fecha: Date.now() - 12 * 60 * 1000, canal: 'whatsapp', nivel: 'alto',
-    titulo: 'Phishing bancario', mensaje: 'URGENTE: Su cuenta bancaria ha sido suspendida. Verifique aquí: http://bbva-mx-verifica.xyz',
-  },
-  {
-    id: 'ej2', fecha: Date.now() - 2 * 60 * 60 * 1000, canal: 'sms', nivel: 'bajo',
-    titulo: 'Mensaje sin señales claras', mensaje: 'Hola, te comparto el comprobante de la transferencia por la compra de la bicicleta.',
-  },
-  {
-    id: 'ej3', fecha: Date.now() - 26 * 60 * 60 * 1000, canal: 'sms', nivel: 'medio',
-    titulo: 'Paquete retenido', mensaje: 'Su paquete está retenido en aduana. Pague $35 MXN de envío en el siguiente enlace para liberarlo.',
-  },
-  {
-    id: 'ej4', fecha: Date.now() - 3 * 24 * 60 * 60 * 1000, canal: 'whatsapp', nivel: 'bajo',
-    titulo: 'Mensaje sin señales claras', mensaje: 'Nos vemos mañana a las 10:00 en la oficina para revisar el presupuesto.',
-  },
-];
+const CLAVE_INVITADO = 'adp_historial_invitado';
+const MAXIMO = 200;
 
-export function leerHistorial() {
+function leerInvitado() {
   try {
-    const guardado = JSON.parse(localStorage.getItem(CLAVE));
+    const guardado = JSON.parse(sessionStorage.getItem(CLAVE_INVITADO));
     if (Array.isArray(guardado)) return guardado;
   } catch {
     // sin almacenamiento
   }
-  return EJEMPLOS_INICIALES;
+  return [];
 }
 
-function escribir(lista) {
+function escribirInvitado(lista) {
   try {
-    localStorage.setItem(CLAVE, JSON.stringify(lista));
+    sessionStorage.setItem(CLAVE_INVITADO, JSON.stringify(lista));
   } catch {
     // sin almacenamiento
   }
 }
 
-export function agregarAlHistorial(resultado, canal) {
-  const lista = leerHistorial();
+export async function leerHistorial(sesion) {
+  if (sesion?.invitado) return leerInvitado();
+  const { elementos } = await solicitud(`/api/historial?limite=${MAXIMO}`);
+  return elementos.map((elemento) => ({ ...elemento, fecha: Date.parse(elemento.fecha) }));
+}
+
+export function agregarAlHistorialInvitado(resultado, canal) {
   const nuevo = {
     id: String(Date.now()),
     fecha: Date.now(),
@@ -49,15 +40,29 @@ export function agregarAlHistorial(resultado, canal) {
     mensaje: resultado.mensaje,
     resultado,
   };
-  escribir([nuevo, ...lista].slice(0, 200));
+  escribirInvitado([nuevo, ...leerInvitado()].slice(0, MAXIMO));
 }
 
-export function borrarHistorial() {
-  escribir([]);
+export async function eliminarDelHistorial(id, sesion) {
+  if (sesion?.invitado) escribirInvitado(leerInvitado().filter((item) => item.id !== id));
+  else await solicitud(`/api/historial/${id}`, { metodo: 'DELETE' });
 }
 
-export function exportarHistorial() {
-  const blob = new Blob([JSON.stringify(leerHistorial(), null, 2)], { type: 'application/json' });
+export async function borrarHistorial(sesion) {
+  if (sesion?.invitado) borrarHistorialInvitado();
+  else await solicitud('/api/historial', { metodo: 'DELETE' });
+}
+
+export function borrarHistorialInvitado() {
+  try {
+    sessionStorage.removeItem(CLAVE_INVITADO);
+  } catch {
+    // sin almacenamiento
+  }
+}
+
+export function exportarHistorial(lista) {
+  const blob = new Blob([JSON.stringify(lista, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;

@@ -18,7 +18,7 @@ Esta guía es para quien **no tiene nada instalado**. Síguela en orden y no te 
 
 ## Parte A — Instalar programas (una sola vez)
 
-Instala estos 5 programas. Después de instalarlos todos, **reinicia la computadora**.
+Instala estos 6 programas. Después de instalarlos todos, **reinicia la computadora**.
 
 ### A1. Visual Studio Code (el editor)
 
@@ -57,6 +57,11 @@ Instala estos 5 programas. Después de instalarlos todos, **reinicia la computad
    (si no tienes cuenta, créala gratis en https://github.com/signup).
 4. En "Configure Git" deja tu nombre y correo → **Finish**.
 
+### A6. PostgreSQL (la base de datos)
+
+1. Entra a **https://www.postgresql.org/download/windows/** y descarga el instalador.
+2. Instálalo con las opciones normales. **Anota la contraseña del usuario `postgres`** y deja el puerto **5432**.
+
 ### ✅ Reinicia la computadora
 
 Esto hace que Windows reconozca todos los programas nuevos.
@@ -76,7 +81,7 @@ Esto hace que Windows reconozca todos los programas nuevos.
 7. Cuando termine, da clic en el botón **Open in Visual Studio Code**
    (o en el menú **Repository → Open in Visual Studio Code**).
 
-En VS Code, a la izquierda, debes ver las carpetas `backend` y `frontend` y los archivos `README.md`, `LICENSE`, etc.
+En VS Code, a la izquierda, debes ver la carpeta `antesdepicar (1)`; dentro están `backend` y `frontend`.
 
 ---
 
@@ -102,7 +107,7 @@ Descarga unos 2 GB. Espera a que diga **success**. Mientras tanto puedes seguir 
 En una terminal **Command Prompt** escribe estos comandos **uno por uno**, presionando Enter después de cada uno:
 
 ```
-cd backend
+cd "antesdepicar (1)\backend"
 ```
 
 ```
@@ -129,6 +134,22 @@ pip install -r requirements.txt
 
 Espera a que diga **Successfully installed …**
 
+### C3. Crear la base de datos
+
+Con `(venv)` activado y dentro de `backend`:
+
+```
+python scripts/preparar_bd.py
+```
+
+Escribe la contraseña de `postgres` cuando la pida (no se ve al escribir). El script crea las bases y el archivo `.env`, que **nunca** se sube a GitHub. Después crea las tablas:
+
+```
+alembic upgrade head
+```
+
+Repite `alembic upgrade head` cuando alguien del equipo agregue una migración.
+
 ---
 
 ## Parte D — Preparar el frontend (una sola vez)
@@ -137,7 +158,7 @@ Espera a que diga **Successfully installed …**
 2. Escribe uno por uno:
 
 ```
-cd frontend
+cd "antesdepicar (1)\frontend"
 ```
 
 ```
@@ -157,7 +178,7 @@ Primero, revisa que la **llamita de Ollama** esté junto al reloj. Si no está, 
 ### Terminal 1 — Backend
 
 ```
-cd backend
+cd "antesdepicar (1)\backend"
 venv\Scripts\activate
 uvicorn main:app --reload --port 8000
 ```
@@ -167,7 +188,7 @@ Debe aparecer `Uvicorn running on http://127.0.0.1:8000`.
 ### Terminal 2 — Frontend
 
 ```
-cd frontend
+cd "antesdepicar (1)\frontend"
 npm run dev
 ```
 
@@ -178,7 +199,7 @@ Aparece `http://localhost:5173`. Mantén presionada **Ctrl** y da clic en el enl
 ### Comprobar que todo funciona
 
 1. En el navegador abre **http://localhost:8000/api/salud**. Debe decir:
-   `"ollama":true` y `"modelo_disponible":true`
+   `"base_datos":true`, `"ollama":true` y `"modelo_disponible":true`
 2. En **http://localhost:5173** entra como invitado.
 3. Da clic en el ejemplo **SMS del "banco"** → **Analizar**.
 4. La primera vez tarda 20–40 segundos. Luego verás el resultado con las frases resaltadas.
@@ -227,8 +248,9 @@ Cada quien edita **solo sus archivos** (ver la tabla al final) para no chocar.
 | `"ollama" no se reconoce…` | Instala Ollama (A4) y reinicia VS Code por completo. |
 | `"npm" no se reconoce…` | Instala Node.js (A2) y reinicia la computadora. |
 | `la ejecución de scripts está deshabilitada` | Cambia la terminal a **Command Prompt** (flechita ˅ junto al +). |
-| `Could not read package.json` | No estás en `frontend`. Escribe `cd frontend`. |
-| `No such file … requirements.txt` | No estás en `backend`. Escribe `cd backend`. |
+| `"base_datos":false` o *La base de datos no está disponible* | Revisa que el servicio de PostgreSQL esté encendido, que exista `backend/.env` y ejecuta `alembic upgrade head`. |
+| `Could not read package.json` | No estás en `frontend`. Escribe `cd "antesdepicar (1)\frontend"`. |
+| `No such file … requirements.txt` | No estás en `backend`. Escribe `cd "antesdepicar (1)\backend"`. |
 | `"uvicorn" no se reconoce…` | Te faltó `venv\Scripts\activate` (la línea debe empezar con `(venv)`). |
 | `Microsoft Visual C++ 14.0 or greater is required` | Revisa que `backend/requirements.txt` diga `uvicorn>=0.29` (sin `[standard]`) y repite `pip install -r requirements.txt`. |
 | En la página: *No se pudo conectar con el servidor* | La Terminal 1 (backend) no está encendida. |

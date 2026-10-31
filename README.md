@@ -64,7 +64,7 @@ Using open-weight models can help us:
 - Explore privacy-conscious deployment options.
 - Allow developers to inspect and improve the project.
 
-The selected model and its license will be documented as development progresses.
+The current model is Qwen 2.5 (`qwen2.5:3b`), run locally with Ollama. Check its license terms before any use beyond research or evaluation.
 
 ## Technology Stack
 
@@ -73,8 +73,9 @@ The selected model and its license will be documented as development progresses.
 | React | User interface |
 | JavaScript | Application development |
 | Vite | Frontend development environment |
-| Node.js | Backend runtime |
-| Express | REST API |
+| Python & FastAPI | REST API |
+| PostgreSQL | Accounts, analysis history and community reports |
+| SQLAlchemy & Alembic | Data models and migrations |
 | Open-weight AI model | Suspicious message analysis |
 | Git & GitHub | Version control and collaboration |
 
@@ -84,7 +85,8 @@ User safety is a priority.
 
 The project aims to follow these principles:
 
-- Do not store analyzed messages by default.
+- Store analyzed messages only for signed-in users, in their private history. Guest analyses are not stored in the database.
+- Store passwords only as Argon2id hashes.
 - Protect API credentials using environment variables.
 - Never expose private API keys in frontend code.
 - Avoid logging sensitive message content.

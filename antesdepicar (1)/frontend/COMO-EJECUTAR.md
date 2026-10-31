@@ -46,7 +46,7 @@ La terminal debe quedarse abierta mientras uses la página. Para apagarla: **Ctr
 
 ## ¿Qué funciona ya?
 
-- **Login y registro** (por ahora se guardan solo en el navegador), o "Continuar como invitado".
+- **Login, registro e historial por cuenta**: necesitan el backend y PostgreSQL. "Continuar como invitado" funciona sin cuenta.
 - **Las 4 secciones** con su diseño: Analizador, Feed de alertas, Centro de verificación e Historial.
 - El **verificador de enlaces** del Centro de Verificación funciona sin backend.
 - El **Analizador** necesita el backend. Mientras no esté conectado, te mostrará un aviso y el botón

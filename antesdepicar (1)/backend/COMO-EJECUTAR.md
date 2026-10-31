@@ -1,6 +1,7 @@
 # Cómo ejecutar el backend de AntesDePicar en Windows (desde cero)
 
-El backend tiene 2 partes:
+El backend tiene 3 partes:
+- **PostgreSQL**: guarda cuentas, sesiones, historial y reportes.
 - **Ollama + Qwen**: el modelo de IA de pesos abiertos que analiza los mensajes.
 - **API en Python (FastAPI)**: recibe el mensaje del frontend, se lo pasa a Qwen y devuelve el resultado.
 
@@ -67,6 +68,13 @@ pip install -r requirements.txt
 
 Tarda 1–2 minutos.
 
+Después prepara la base de datos (necesitas PostgreSQL instalado y la contraseña de su usuario `postgres`):
+
+```
+python scripts/preparar_bd.py
+alembic upgrade head
+```
+
 ## Paso 5. Encender el backend
 
 ```
@@ -80,9 +88,10 @@ Compruébalo abriendo en tu navegador: http://localhost:8000/api/salud
 Debe decir algo como:
 
 ```
-{"api":true,"ollama":true,"modelo":"qwen2.5:3b","modelo_disponible":true}
+{"api":true,"base_datos":true,"ollama":true,"modelo":"qwen2.5:3b","modelo_disponible":true}
 ```
 
+- `"base_datos": false` → revisa el servicio de PostgreSQL, el archivo `.env` y ejecuta `alembic upgrade head`.
 - `"ollama": false` → abre la app de Ollama desde el menú Inicio.
 - `"modelo_disponible": false` → falta el Paso 2 (`ollama pull qwen2.5:3b`).
 
@@ -130,9 +139,8 @@ npm run dev
 ## Cambiar a un modelo más preciso (opcional)
 
 1. `ollama pull qwen2.5:7b`
-2. En la carpeta del backend, copia `.env.example` y renombra la copia a `.env`.
-3. En `.env` cambia la línea a `OLLAMA_MODEL=qwen2.5:7b`.
-4. Apaga el backend (Ctrl + C) y vuelve a encenderlo.
+2. En el archivo `.env` del backend, cambia la línea a `OLLAMA_MODEL=qwen2.5:7b`.
+3. Apaga el backend (Ctrl + C) y vuelve a encenderlo.
 
 ## ¿Quién edita qué?
 

@@ -1,5 +1,5 @@
 // Componente principal: decide si mostrar el login o la app (responsable: Daniela)
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
 import Login from './pages/Login.jsx';
@@ -17,9 +17,15 @@ const PAGINAS = {
 };
 
 export default function App() {
-  const [sesion, setSesion] = useState(obtenerSesion);
+  const [sesion, setSesion] = useState(null);
+  const [comprobando, setComprobando] = useState(true);
   const [pagina, setPagina] = useState('analizador');
 
+  useEffect(() => {
+    obtenerSesion().then(setSesion).finally(() => setComprobando(false));
+  }, []);
+
+  if (comprobando) return null;
   if (!sesion) return <Login onEntrar={setSesion} />;
 
   function irA(nueva) {
@@ -27,8 +33,14 @@ export default function App() {
     window.scrollTo({ top: 0 });
   }
 
-  function salir() {
-    cerrarSesion();
+  async function salir() {
+    try {
+      await cerrarSesion(sesion);
+    } catch (err) {
+      // Si no se pudo revocar, no aparentamos que la sesión se cerró.
+      window.alert(`No se pudo cerrar la sesión. ${err.message}`);
+      return;
+    }
     setSesion(null);
     setPagina('analizador');
   }
@@ -39,7 +51,7 @@ export default function App() {
     <>
       <Navbar pagina={pagina} onCambiar={irA} sesion={sesion} onSalir={salir} />
       <main className="contenedor">
-        <Pagina irA={irA} />
+        <Pagina irA={irA} sesion={sesion} />
       </main>
       <Footer />
     </>

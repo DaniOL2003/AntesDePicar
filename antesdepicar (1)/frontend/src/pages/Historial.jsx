@@ -1,8 +1,7 @@
 // Historial y privacidad (responsable: Daniela)
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { LuShieldCheck, LuShieldAlert, LuTriangleAlert, LuCircleCheck, LuDownload, LuTrash2, LuSearch, LuWifiOff, LuCpu, LuHardDrive, LuInfo, LuChevronDown, LuX } from 'react-icons/lu';
-import { borrarHistorial, exportarHistorial, leerHistorial } from '../services/historial.js';
-import { obtenerSesion } from '../services/auth.js';
+import { borrarHistorial, eliminarDelHistorial, exportarHistorial, leerHistorial } from '../services/historial.js';
 import './Historial.css';
 
 const NIVEL = {
@@ -36,13 +35,23 @@ function Anillo({ porcentaje }) {
   );
 }
 
-export default function Historial() {
-  const [lista, setLista] = useState(leerHistorial);
+export default function Historial({ sesion }) {
+  const [lista, setLista] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState('');
   const [busqueda, setBusqueda] = useState('');
   const [filtro, setFiltro] = useState('todos');
   const [visibles, setVisibles] = useState(POR_PAGINA);
   const [detalle, setDetalle] = useState(null);
-  const sesion = obtenerSesion();
+
+  useEffect(() => {
+    let vigente = true;
+    leerHistorial(sesion)
+      .then((datos) => { if (vigente) setLista(datos); })
+      .catch((err) => { if (vigente) setError(err.message); })
+      .finally(() => { if (vigente) setCargando(false); });
+    return () => { vigente = false; };
+  }, [sesion]);
 
   const conteo = useMemo(() => ({
     todos: lista.length,
@@ -58,10 +67,27 @@ export default function Historial() {
     return lista.filter((i) => (filtro === 'todos' || i.nivel === filtro) && (!q || `${i.titulo} ${i.mensaje} ${CANAL[i.canal]}`.toLowerCase().includes(q)));
   }, [lista, busqueda, filtro]);
 
-  function borrar() {
-    if (window.confirm('¿Borrar todo el historial de este navegador? No se puede deshacer.')) {
-      borrarHistorial();
+  async function borrar() {
+    if (!window.confirm('¿Borrar todo tu historial? No se puede deshacer.')) return;
+    setError('');
+    try {
+      await borrarHistorial(sesion);
       setLista([]);
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  async function eliminar(item) {
+    if (!window.confirm('¿Eliminar este análisis? No se puede deshacer.')) return;
+    setError('');
+    try {
+      await eliminarDelHistorial(item.id, sesion);
+      setLista((actual) => actual.filter((i) => i.id !== item.id));
+      setDetalle(null);
+    } catch (err) {
+      setDetalle(null);
+      setError(err.message);
     }
   }
 
@@ -83,7 +109,7 @@ export default function Historial() {
           </div>
         </div>
         <div className="historial-acciones">
-          <button type="button" className="btn btn-outline btn-sm" onClick={exportarHistorial} disabled={!lista.length}><LuDownload /> Exportar datos</button>
+          <button type="button" className="btn btn-outline btn-sm" onClick={() => exportarHistorial(lista)} disabled={!lista.length}><LuDownload /> Exportar datos</button>
           <button type="button" className="btn btn-danger btn-sm" onClick={borrar} disabled={!lista.length}><LuTrash2 /> Borrar historial</button>
         </div>
       </div>
@@ -100,7 +126,7 @@ export default function Historial() {
             <div className="card mini">
               <div className="mini-cabecera"><span className="muted">Envío a terceros</span><LuWifiOff /></div>
               <strong>0 Bytes</strong>
-              <span className="muted">El historial nunca sale de tu navegador</span>
+              <span className="muted">No se comparte con servicios externos</span>
             </div>
             <div className="card mini">
               <div className="mini-cabecera"><span className="muted">IA externa</span><LuCpu /></div>
@@ -112,8 +138,8 @@ export default function Historial() {
           <div className="card fila-estado">
             <LuHardDrive />
             <div>
-              <strong>Almacenamiento local</strong>
-              <span className="muted">Guardado solo en este dispositivo</span>
+              <strong>{sesion?.invitado ? 'Modo invitado' : 'Base de datos privada'}</strong>
+              <span className="muted">{sesion?.invitado ? 'Solo en esta pestaña; se borra al salir' : 'Solo tu cuenta puede verlo'}</span>
             </div>
             <span className="punto lima-punto" />
           </div>
@@ -123,7 +149,7 @@ export default function Historial() {
             <div className="card total"><strong className="rojo">{conteo.alto}</strong><span className="muted">Riesgo alto</span></div>
           </div>
 
-          <p className="nota-privacidad"><LuInfo /> Nota de privacidad: tu historial se guarda solo en la memoria de este navegador. Puedes exportarlo o borrarlo cuando quieras.</p>
+          <p className="nota-privacidad"><LuInfo /> Nota de privacidad: {sesion?.invitado ? 'como invitado, tu historial se guarda solo en esta pestaña.' : 'tu historial se guarda en nuestra base de datos, asociado a tu cuenta.'} Puedes exportarlo o borrarlo cuando quieras.</p>
         </aside>
 
         <section className="card historial-lista">
@@ -137,7 +163,11 @@ export default function Historial() {
             ))}
           </div>
 
-          {filtrada.length === 0 ? (
+          {error && <p className="aviso-demo" role="alert">{error}</p>}
+
+          {cargando ? (
+            <p className="muted vacio">Cargando tu historial…</p>
+          ) : filtrada.length === 0 ? (
             <p className="muted vacio">{lista.length ? 'Nada coincide con tu búsqueda.' : 'Aún no has analizado mensajes. Tus análisis aparecerán aquí.'}</p>
           ) : (
             <ul className="items">
@@ -177,18 +207,13 @@ export default function Historial() {
             <h3>{detalle.titulo}</h3>
             <p className="muted">{tiempoRelativo(detalle.fecha)} · {CANAL[detalle.canal] || detalle.canal}</p>
             <p className="detalle-mensaje">{detalle.mensaje}</p>
-            {detalle.resultado ? (
-              <>
-                {detalle.resultado.resumen && <p>{detalle.resultado.resumen}</p>}
-                {detalle.resultado.senales?.length > 0 && (
-                  <ul className="detalle-lista">
-                    {detalle.resultado.senales.map((s, k) => <li key={k}><strong>{s.titulo}:</strong> {s.explicacion}</li>)}
-                  </ul>
-                )}
-              </>
-            ) : (
-              <p className="aviso-demo">Registro de ejemplo: no tiene análisis detallado guardado.</p>
+            {detalle.resultado.resumen && <p>{detalle.resultado.resumen}</p>}
+            {detalle.resultado.senales?.length > 0 && (
+              <ul className="detalle-lista">
+                {detalle.resultado.senales.map((s, k) => <li key={k}><strong>{s.titulo}:</strong> {s.explicacion}</li>)}
+              </ul>
             )}
+            <button type="button" className="btn btn-danger btn-sm" onClick={() => eliminar(detalle)}><LuTrash2 /> Eliminar este análisis</button>
           </div>
         </div>
       )}
