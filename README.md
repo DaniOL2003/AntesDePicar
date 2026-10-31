@@ -1,80 +1,81 @@
-#  AntesDePicar — Protección inteligente contra estafas digitales
+# 🛡️ AntesDePicar — Smart protection against digital scams
 
-> **Antes de hacer clic, piensa y verifica.**
+> **Think before you click. Verify before you trust.**
 
-AntesDePicar es una aplicación web **open source** que usa **inteligencia artificial de pesos abiertos (Qwen 2.5, ejecutado localmente con Ollama)** para ayudar a las personas a identificar posibles estafas en mensajes de WhatsApp, SMS, correos electrónicos y ofertas de empleo.
+AntesDePicar ("before you take the bait") is an **open-source** web app that uses **open-weight AI (Qwen 2.5, running locally with Ollama)** to help people spot possible scams in WhatsApp messages, SMS, emails and job offers.
 
-No solo dice si un mensaje parece fraudulento: **resalta las frases sospechosas dentro del mensaje, explica por qué lo son y recomienda cómo verificar de forma segura**, antes de hacer clic, compartir datos o pagar.
+It doesn't just say whether a message looks fraudulent: it **highlights the suspicious phrases inside the message, explains why they are risky, and recommends how to verify safely** before clicking, sharing personal data or paying.
 
-Proyecto creado para el **Hacktoberfest Hack Day Oaxaca x Oaxacoders 2026** — categoría *Best Open-Source AI Project*.
+Built for **Hacktoberfest Hack Day Oaxaca x Oaxacoders 2026** — *Best Open-Source AI Project* category.
 
 ---
 
-## ¿Por qué IA de pesos abiertos?
+## Why open-weight AI?
 
-- **Privacidad:** el mensaje se analiza en nuestro propio servidor con Ollama; no se envía a APIs de terceros.
-- **Transparencia:** cualquiera puede revisar el modelo, el prompt y el código.
-- **Bajo costo:** funciona con un modelo pequeño (`qwen2.5:3b`) en una laptop normal.
+- **Privacy:** messages are analyzed on our own server with Ollama; nothing is sent to third-party APIs.
+- **Transparency:** anyone can inspect the model, the prompt and the code.
+- **Low cost:** runs with a small model (`qwen2.5:3b`) on a regular laptop.
 
-El modelo **Qwen 2.5** es el núcleo del proyecto: lee el mensaje, detecta señales de riesgo, cita la evidencia textual y genera recomendaciones. Además, el backend **verifica que cada frase citada por la IA exista realmente en el mensaje**, para no mostrar evidencias inventadas.
+**Qwen 2.5** is the core of the project: it reads the message, detects risk signals, quotes the exact evidence and generates recommendations. The backend also **verifies that every phrase quoted by the AI actually exists in the original message**, so made-up evidence is never shown as fact.
 
-## Funcionalidades
+## Features
 
-| Sección | Qué hace |
+| Section | What it does |
 |---|---|
-| **Cuentas de usuario** | Registro e inicio de sesión guardados en base de datos (contraseñas cifradas con PBKDF2), o acceso como invitado. |
-| **Analizador de mensajes** | Pega un mensaje, elige el canal y la IA devuelve nivel de riesgo, frases sospechosas resaltadas, explicación de cada señal y recomendaciones. |
-| **Feed de alertas comunitarias** | Modalidades de fraude comunes en México con sus señales y consejos; permite reportar mensajes. |
-| **Centro de verificación oficial** | Directorio de dominios y teléfonos oficiales (CONDUSEF, PROFECO, Banxico, bancos, paqueterías) y un verificador que detecta enlaces que imitan a una institución. |
-| **Historial y privacidad** | Con cuenta, el historial se guarda en la base de datos; como invitado, solo en el navegador. Búsqueda, filtros, exportación y borrado. |
+| **User accounts** | Sign up and log in with accounts stored in a database (passwords hashed with PBKDF2), or continue as a guest. |
+| **Message analyzer** | Paste a message, pick the channel, and the AI returns a risk level, highlighted suspicious phrases, an explanation of each signal and recommendations. |
+| **Community alerts feed** | Common scam patterns in Mexico with their warning signs and tips; users can report suspicious messages. |
+| **Official verification center** | Directory of official domains and phone numbers (CONDUSEF, PROFECO, Banxico, banks, couriers) plus a link checker that detects look-alike domains. |
+| **History & privacy** | With an account, history is stored in the database; as a guest, only in the browser. Search, filters, export and delete. |
 
-## Tecnologías
+> The app interface is in Spanish, since it is designed for users in Mexico.
+
+## Tech stack
 
 - **Frontend:** React 18, Vite, react-icons
 - **Backend:** Python, FastAPI, Pydantic, httpx
-- **Base de datos:** SQLite (incluida en Python, sin instalación extra)
-- **IA:** Qwen 2.5 (modelo de pesos abiertos) ejecutado con Ollama
+- **Database:** SQLite (built into Python, no extra installation)
+- **AI:** Qwen 2.5 (open-weight model) running on Ollama
 
-## Arquitectura
+## Architecture
 
 ```
-Navegador (React + Vite)  ──POST /api/analizar──▶  FastAPI  ──▶  Ollama  ──▶  Qwen 2.5
-       :5173                                         :8000         :11434
+Browser (React + Vite)  ──POST /api/analizar──▶  FastAPI  ──▶  Ollama  ──▶  Qwen 2.5
+       :5173                                       :8000         :11434
 ```
 
 ```
 antesdepicar/
 ├── README.md
-├── GUIA-EQUIPO.md              # Instalación paso a paso para principiantes
+├── GUIA-EQUIPO.md              # Step-by-step setup guide for beginners (Spanish)
 ├── LICENSE
 ├── .gitignore
 ├── backend/
-│   ├── main.py                 # API: rutas, CORS y manejo de errores
-│   ├── schemas.py              # Validación de entrada y salida
-│   ├── database.py             # Base de datos SQLite: usuarios, sesiones, historial, reportes
-│   ├── prompts.py              # Instrucciones para Qwen y esquema JSON
-│   ├── services/ai_service.py  # Conexión con Ollama + verificación de evidencias
-│   ├── tests/test_api.py       # Pruebas automáticas
+│   ├── main.py                 # API: routes, CORS and error handling
+│   ├── schemas.py              # Input and output validation
+│   ├── database.py             # SQLite database: users, sessions, history, reports
+│   ├── prompts.py              # Instructions for Qwen and JSON schema
+│   ├── services/ai_service.py  # Ollama connection + evidence verification
+│   ├── tests/test_api.py       # Automated tests
 │   ├── requirements.txt
-│   └── COMO-EJECUTAR.md        # Guía paso a paso del backend (Windows)
+│   └── COMO-EJECUTAR.md        # Backend setup guide (Windows, Spanish)
 └── frontend/
+    ├── public/                 # Logo and icon
     ├── src/
-    │   ├── pages/              # Login, Analizador, Feed, Verificacion, Historial
+    │   ├── pages/              # Login, Analyzer, Feed, Verification, History
     │   ├── components/         # Navbar, Footer, AnalysisResult, RiskSignal
     │   ├── services/           # api.js, auth.js, historial.js
-    │   ├── data/               # Ejemplos, alertas e instituciones
+    │   ├── data/               # Examples, alerts and institutions
     │   └── styles/global.css
     ├── package.json
-    └── COMO-EJECUTAR.md        # Guía paso a paso del frontend (Windows)
+    └── COMO-EJECUTAR.md        # Frontend setup guide (Windows, Spanish)
 ```
 
-## Cómo ejecutarlo
+## How to run it
 
-Requisitos: **Node.js 18+**, **Python 3.10+** y **Ollama**.
+Requirements: **Node.js 18+**, **Python 3.10+** and **Ollama**.
 
->  **¿Primera vez o no tienes nada instalado?** Sigue la guía paso a paso: **[GUIA-EQUIPO.md](GUIA-EQUIPO.md)**.
-
-### 1. Descargar el modelo de IA
+### 1. Download the AI model
 
 ```bash
 ollama pull qwen2.5:3b
@@ -91,9 +92,9 @@ pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
 
-Comprueba en http://localhost:8000/api/salud · Documentación de la API en http://localhost:8000/docs
+Health check at http://localhost:8000/api/salud · API docs at http://localhost:8000/docs
 
-### 3. Frontend (en otra terminal)
+### 3. Frontend (in another terminal)
 
 ```bash
 cd frontend
@@ -101,7 +102,7 @@ npm install
 npm run dev
 ```
 
-Abre http://localhost:5173
+Open http://localhost:5173
 
 ## API
 
@@ -111,9 +112,9 @@ Abre http://localhost:5173
 { "mensaje": "BBVA: confirma tu NIP en http://bbva-mx-aclaraciones.xyz", "canal": "sms" }
 ```
 
-Canales válidos: `whatsapp`, `sms`, `correo`, `empleo`, `otro`. El mensaje debe tener entre 10 y 5000 caracteres.
+Valid channels: `whatsapp`, `sms`, `correo` (email), `empleo` (job offer), `otro` (other). The message must be between 10 and 5000 characters.
 
-Respuesta (resumida):
+Response (shortened):
 
 ```json
 {
@@ -135,43 +136,43 @@ Respuesta (resumida):
 }
 ```
 
-Errores: `422` mensaje o canal inválido · `503` Ollama apagado o modelo no descargado · `504` tiempo agotado · `502` respuesta inválida del modelo.
+Errors: `422` invalid message or channel · `503` Ollama is off or the model is not downloaded · `504` timeout · `502` invalid model response.
 
-**`GET /api/salud`** — indica si la API, Ollama y el modelo están disponibles.
+**`GET /api/salud`** — reports whether the API, Ollama and the model are available.
 
-**Cuentas y datos (SQLite):**
+**Accounts and data (SQLite):**
 
-| Ruta | Qué hace |
+| Route | What it does |
 |---|---|
-| `POST /api/registro` | Crea una cuenta y devuelve un token de sesión |
-| `POST /api/login` | Inicia sesión y devuelve un token |
-| `POST /api/logout` | Cierra la sesión |
-| `GET /api/historial` | Historial del usuario (requiere `Authorization: Bearer <token>`) |
-| `DELETE /api/historial` | Borra el historial del usuario |
-| `POST /api/reportes` | Guarda un reporte comunitario |
-| `GET /api/estadisticas` | Totales de análisis, riesgo alto, reportes y usuarios |
+| `POST /api/registro` | Creates an account and returns a session token |
+| `POST /api/login` | Logs in and returns a token |
+| `POST /api/logout` | Ends the session |
+| `GET /api/historial` | User history (requires `Authorization: Bearer <token>`) |
+| `DELETE /api/historial` | Deletes the user's history |
+| `POST /api/reportes` | Saves a community report |
+| `GET /api/estadisticas` | Totals for analyses, high-risk results, reports and users |
 
-Si `POST /api/analizar` recibe un token, el análisis se guarda en el historial de ese usuario.
+If `POST /api/analizar` receives a token, the analysis is saved to that user's history.
 
-## Estado del prototipo
+## Prototype status
 
-- El análisis de mensajes usa IA real (Qwen 2.5 vía Ollama).
-- Cuentas, historial y reportes comunitarios se guardan en una base de datos SQLite (`backend/antesdepicar.db`, se crea sola).
-- Las alertas del Feed y sus cifras son datos de demostración.
+- Message analysis uses real AI (Qwen 2.5 via Ollama).
+- Accounts, history and community reports are stored in a SQLite database (`backend/antesdepicar.db`, created automatically).
+- The alerts in the Feed and their numbers are demo data.
 
-## Equipo
+## Team
 
-| Integrante | Rol |
+| Member | Role |
 |---|---|
-| Fredy | Backend de IA: prompt, conexión con Qwen y verificación de evidencias |
-| Eduardo | Backend API e integración |
-| Daniela | Frontend principal y GitHub |
-| Kelly | Frontend de resultados, alertas y demo |
+| Fredy | AI backend: prompt, Qwen integration and evidence verification |
+| Eduardo | Backend API and integration |
+| Daniela | Main frontend and GitHub |
+| Kelly | Results UI, alerts and demo |
 
-## Aviso
+## Disclaimer
 
-AntesDePicar ofrece un análisis **orientativo**. La IA puede equivocarse: verifica siempre por canales oficiales. Si fuiste víctima de fraude, contacta a tu banco y a la CONDUSEF.
+AntesDePicar provides **guidance only**. The AI can make mistakes: always verify through official channels. If you have been a victim of fraud, contact your bank and CONDUSEF (Mexico's financial consumer protection agency).
 
-## Licencia
+## License
 
-Distribuido bajo la licencia [MIT](LICENSE).
+Distributed under the [MIT](LICENSE) license.
