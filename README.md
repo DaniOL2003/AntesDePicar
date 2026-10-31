@@ -1,4 +1,4 @@
-# 🛡️ AntesDePicar — Protección inteligente contra estafas digitales
+#  AntesDePicar — Protección inteligente contra estafas digitales
 
 > **Antes de hacer clic, piensa y verifica.**
 
@@ -72,7 +72,7 @@ antesdepicar/
 
 Requisitos: **Node.js 18+**, **Python 3.10+** y **Ollama**.
 
-> 📘 **¿Primera vez o no tienes nada instalado?** Sigue la guía paso a paso: **[GUIA-EQUIPO.md](GUIA-EQUIPO.md)**.
+>  **¿Primera vez o no tienes nada instalado?** Sigue la guía paso a paso: **[GUIA-EQUIPO.md](GUIA-EQUIPO.md)**.
 
 ### 1. Descargar el modelo de IA
 
