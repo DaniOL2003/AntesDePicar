@@ -1,0 +1,35 @@
+.cifras-verif { display: flex; gap: 28px; padding: 14px 22px; }
+.cifras-verif div { display: grid; text-align: center; }
+.cifras-verif strong { font-size: 1.5rem; color: var(--lime); font-weight: 800; line-height: 1.2; }
+.cifras-verif span { font-size: 0.74rem; color: var(--muted); }
+
+.institucion { display: flex; flex-direction: column; gap: 14px; }
+.institucion-cabecera { display: flex; justify-content: space-between; align-items: center; }
+.sigla { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; background: var(--card-2);
+  border: 1px solid var(--border); font-weight: 800; font-size: 0.82rem; color: var(--muted); }
+.institucion h3 { font-size: 1.08rem; margin-bottom: 4px; }
+.institucion-desc { font-size: 0.82rem; min-height: 2.6em; }
+.datos { margin: 0; display: grid; gap: 8px; padding: 12px; border-radius: 10px; background: var(--bg-2); border: 1px solid var(--border); flex: 1; align-content: start; }
+.datos div { display: flex; justify-content: space-between; gap: 10px; font-size: 0.82rem; }
+.datos dt { color: var(--muted); }
+.datos dd { margin: 0; color: var(--lime); }
+
+.seccion-guia { display: grid; gap: 10px; margin-top: 12px; }
+.seccion-guia h2 { font-size: 1.6rem; font-weight: 800; }
+.seccion-guia > p { margin-bottom: 8px; }
+.guia { display: grid; gap: 10px; align-content: start; }
+.guia h3 { font-size: 1rem; }
+.guia p { font-size: 0.86rem; }
+.guia-pie { display: inline-flex; gap: 6px; align-items: center; font-size: 0.8rem; color: var(--lime); font-weight: 600; }
+
+.lima-texto { color: var(--lime); }
+.veredicto { display: flex; gap: 12px; padding: 14px; border-radius: 10px; font-size: 0.9rem; }
+.veredicto > svg { font-size: 1.4rem; flex: none; }
+.veredicto p { margin-top: 4px; }
+.veredicto-oficial { background: var(--lime-dim); border: 1px solid rgba(166,226,46,.4); }
+.veredicto-oficial > svg, .veredicto-oficial strong { color: var(--lime); }
+.veredicto-sospechoso, .veredicto-invalido { background: var(--critico-dim); border: 1px solid rgba(255,93,82,.4); }
+.veredicto-sospechoso > svg, .veredicto-sospechoso strong, .veredicto-invalido strong { color: var(--critico); }
+.veredicto-aviso { color: var(--moderado); font-size: 0.84rem; }
+
+@media (max-width: 620px) { .cifras-verif { width: 100%; justify-content: space-around; } }
