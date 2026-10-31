@@ -1,4 +1,4 @@
-# 🛡️ AntesDePicar — Smart protection against digital scams
+#  AntesDePicar — Smart protection against digital scams
 
 > **Think before you click. Verify before you trust.**
 
