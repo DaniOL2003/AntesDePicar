@@ -1,4 +1,4 @@
-# 🛡️ AntesDePicar
+# AntesDePicar
 
 ### Think before you click. Verify before you trust.
 
@@ -10,7 +10,7 @@ Our goal is not simply to label a message as fraudulent or legitimate, but to he
 
 ---
 
-## 🚨 The Problem
+## The Problem
 
 Digital scams are increasingly common. Many people receive deceptive messages through WhatsApp, SMS, email, and social media.
 
@@ -23,7 +23,7 @@ These messages may attempt to:
 
 Not everyone knows how to recognize these warning signs. AntesDePicar aims to make digital security easier to understand and accessible to everyone.
 
-## 💡 Our Solution
+## Our Solution
 
 AntesDePicar uses artificial intelligence to analyze suspicious messages and provide understandable explanations.
 
@@ -38,7 +38,7 @@ Instead of simply saying "This is a scam", the application aims to show:
 
 The analysis is intended as guidance, not as definitive proof of fraud.
 
-## ✨ Main Features
+## Main Features
 
 The first version is planned to include:
 
@@ -51,7 +51,7 @@ The first version is planned to include:
 - A simple and responsive user interface.
 - Spanish-language support.
 
-## 🧠 Artificial Intelligence and Open Innovation
+## Artificial Intelligence and Open Innovation
 
 AntesDePicar is being developed around open-weight artificial intelligence models.
 
@@ -66,7 +66,7 @@ Using open-weight models can help us:
 
 The selected model and its license will be documented as development progresses.
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 | Technology | Purpose |
 |---|---|
@@ -78,7 +78,7 @@ The selected model and its license will be documented as development progresses.
 | Open-weight AI model | Suspicious message analysis |
 | Git & GitHub | Version control and collaboration |
 
-## 🔐 Privacy and Security
+## Privacy and Security
 
 User safety is a priority.
 
@@ -91,7 +91,7 @@ The project aims to follow these principles:
 - Warn users not to share passwords, verification codes, or banking information.
 - Clearly communicate that AI results may contain errors.
 
-## 🎯 Project Goals
+## Project Goals
 
 Our goals are to:
 
@@ -101,7 +101,7 @@ Our goals are to:
 4. Explore practical applications of open-source AI.
 5. Build an accessible tool that can be improved by the developer community.
 
-## 🚀 Project Status
+##  Project Status
 
 **Currently in development.**
 
@@ -109,7 +109,7 @@ We are working on the first functional version, focusing on text analysis, risk 
 
 Some features described in this README are planned and may not yet be available.
 
-## 🔮 Future Improvements
+##  Future Improvements
 
 Potential future features include:
 
@@ -120,7 +120,7 @@ Potential future features include:
 - Additional language support.
 - Educational resources about digital security.
 
-## 👥 Development Team
+## Development Team
 
 Developed by a team of Computer Systems Engineering students:
 
@@ -129,16 +129,16 @@ Developed by a team of Computer Systems Engineering students:
 3. **Kelly Adanari Cruz Alonso**
 4. **Fredy Azarel Gómez Vásquez**
 
-## 🌎 Open Source
+## Open Source
 
 We believe technology and digital protection should be accessible to everyone.
 
 Contributions, suggestions, and improvements from the developer community are welcome.
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
 
-**AntesDePicar — Think before you click. Verify before you trust.** 🛡️
+**AntesDePicar — Think before you click. Verify before you trust.** 
